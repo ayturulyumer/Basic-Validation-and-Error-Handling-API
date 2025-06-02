@@ -26,3 +26,8 @@ export function updateItem(id: string, name: string): Item | undefined {
   items[itemIndex].name = name;
   return items[itemIndex];
 }
+
+// src/services/itemsService.ts
+export function deleteItemById(id: string): void {
+  items = items.filter(item => item.id !== id);
+}
