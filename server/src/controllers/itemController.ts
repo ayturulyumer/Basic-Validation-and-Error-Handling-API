@@ -8,6 +8,7 @@ import {
   getItemById,
   updateItem,
 } from "../services/itemService";
+import { validateItem } from "../middlewares/validateItem";
 
 const router = Router();
 
@@ -21,20 +22,10 @@ router.get("/", (req: Request, res: Response) => {
   }
 });
 
-router.post("/", (req: Request, res: Response) => {
-  try {
-    const { name } = req.body;
-    if (!name) {
-      res.status(400).json({ message: "Item name is required" });
-      return;
-    }
-
-    const newItem: Item = addItem(name);
-    res.status(201).json(newItem);
-  } catch (error) {
-    console.error("Error adding item:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+router.post("/", validateItem, (req: Request, res: Response) => {
+  const { name } = req.body;
+  const newItem: Item = addItem(name);
+  res.status(201).json(newItem);
 });
 
 router.get("/:id", (req: Request, res: Response) => {
@@ -55,45 +46,29 @@ router.get("/:id", (req: Request, res: Response) => {
   }
 });
 
-router.put("/:id", (req: Request, res: Response) => {
+router.put("/:id", validateItem, (req: Request, res: Response) => {
   const itemId = req.params.id;
   const { name } = req.body;
 
-  if (!name) {
-    res.status(400).json({ message: "Item name is required" });
+  const updatedItem = updateItem(itemId, name);
+
+  if (!updatedItem) {
+    res.status(404).json({ message: "Item not found" });
     return;
   }
-
-  try {
-    const updatedItem = updateItem(itemId, name);
-
-    if (!updatedItem) {
-      res.status(404).json({ message: "Item not found" });
-      return;
-    }
-    res.status(200).json(updatedItem);
-  } catch (error) {
-    console.error("Error updating item:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+  res.status(200).json(updatedItem);
 });
 
 router.delete("/:id", (req: Request, res: Response) => {
   const itemId = req.params.id;
 
-  try {
     const item = getItemById(itemId);
     if (!item) {
       res.status(404).json({ message: "Item not found" });
       return;
     }
-
     deleteItemById(itemId);
+    res.status(204).send();
 
-    res.status(204).send(); 
-  } catch (error) {
-    console.error("Error deleting item:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
 });
 export default router;
