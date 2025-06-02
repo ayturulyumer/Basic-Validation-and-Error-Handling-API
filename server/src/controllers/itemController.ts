@@ -1,7 +1,12 @@
 // controllers/itemController.ts
 import { Router, Request, Response } from "express";
 import { Item } from "../types/Item";
-import { addItem, getAllItems, getItemById } from "../services/itemService";
+import {
+  addItem,
+  getAllItems,
+  getItemById,
+  updateItem,
+} from "../services/itemService";
 
 const router = Router();
 
@@ -49,5 +54,27 @@ router.get("/:id", (req: Request, res: Response) => {
   }
 });
 
+router.put("/:id", (req: Request, res: Response) => {
+  const itemId = req.params.id;
+  const { name } = req.body;
+
+  if (!name) {
+    res.status(400).json({ message: "Item name is required" });
+    return;
+  }
+
+  try {
+    const updatedItem = updateItem(itemId, name); 
+    
+    if (!updatedItem) {
+      res.status(404).json({ message: "Item not found" });
+      return;
+    }
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    console.error("Error updating item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 export default router;
