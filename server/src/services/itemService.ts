@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from "uuid";
 import { Item } from "../types/Item";
 
@@ -15,5 +14,15 @@ export function addItem(name: string): Item {
 }
 
 export function getItemById(id: string): Item | undefined {
-  return items.find(item => item.id === id);
+  return items.find((item) => item.id === id);
+}
+
+export function updateItem(id: string, name: string): Item | undefined {
+  const itemIndex = items.findIndex((item) => item.id === id);
+  if (itemIndex === -1) {
+    return undefined;
+  }
+
+  items[itemIndex].name = name;
+  return items[itemIndex];
 }
