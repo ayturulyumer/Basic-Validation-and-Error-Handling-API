@@ -3,6 +3,7 @@ import { Router, Request, Response } from "express";
 import { Item } from "../types/Item";
 import {
   addItem,
+  deleteItemById,
   getAllItems,
   getItemById,
   updateItem,
@@ -64,8 +65,8 @@ router.put("/:id", (req: Request, res: Response) => {
   }
 
   try {
-    const updatedItem = updateItem(itemId, name); 
-    
+    const updatedItem = updateItem(itemId, name);
+
     if (!updatedItem) {
       res.status(404).json({ message: "Item not found" });
       return;
@@ -77,4 +78,22 @@ router.put("/:id", (req: Request, res: Response) => {
   }
 });
 
+router.delete("/:id", (req: Request, res: Response) => {
+  const itemId = req.params.id;
+
+  try {
+    const item = getItemById(itemId);
+    if (!item) {
+      res.status(404).json({ message: "Item not found" });
+      return;
+    }
+
+    deleteItemById(itemId);
+
+    res.status(204).send(); 
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 export default router;
