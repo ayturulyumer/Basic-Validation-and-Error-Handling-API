@@ -31,5 +31,23 @@ router.post("/", (req: Request, res: Response) => {
   }
 });
 
+router.get("/:id", (req: Request, res: Response) => {
+  const itemId = req.params.id;
+  console.log(itemId);
+  try {
+    const item = getItemById(itemId);
+
+    if (!item) {
+      res.status(404).json({ message: "Item not found" });
+      return;
+    }
+
+    res.status(200).json(item);
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;
